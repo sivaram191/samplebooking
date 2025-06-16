@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delhivery Client Warehouse Creator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general aesthetics */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem; /* Increased padding */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+            max-width: 900px; /* Increased max-width */
+            width: 95%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Space between sections */
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+            gap: 1.25rem; /* Gap between form fields */
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600; /* Semi-bold labels */
+            color: #374151; /* Darker gray for labels */
+        }
+        .form-group input {
+            padding: 0.75rem 1rem; /* Generous padding */
+            border: 1px solid #d1d5db; /* Light gray border */
+            border-radius: 0.75rem; /* Rounded input fields */
+            font-size: 1rem;
+            color: #374151;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6; /* Blue focus border */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* Light blue shadow on focus */
+        }
+        .btn-primary {
+            background-image: linear-gradient(to right, #6366f1, #3b82f6); /* Gradient background */
+            color: white;
+            padding: 0.85rem 1.75rem; /* More padding */
+            border-radius: 0.75rem; /* Rounded button */
+            font-weight: 700; /* Bold text */
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Button shadow */
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+        }
+        .message-box {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1.5rem;
+            word-wrap: break-word; /* Ensure long messages wrap */
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .message-box.success {
+            background-color: #d1fae5; /* Green background for success */
+            color: #065f46; /* Dark green text */
+            border: 1px solid #34d399;
+        }
+        .message-box.error {
+            background-color: #fee2e2; /* Red background for error */
+            color: #991b1b; /* Dark red text */
+            border: 1px solid #ef4444;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6; /* Blue spinner */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            display: none; /* Hidden by default */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .text-center {
+            text-align: center;
+        }
+        h1 {
+            color: #1f2937; /* Darker heading color */
+            margin-bottom: 1.5rem;
+            font-size: 2.25rem; /* Larger heading */
+            font-weight: 800; /* Extra bold */
+        }
+        .text-sm {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Delhivery Client Warehouse Creator</h1>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner"></div>
+
+        <!-- JWT Status Message -->
+        <div id="jwtStatus" class="message-box success hidden">
+            <p><strong>JWT Status:</strong> <span id="jwtMessage">Attempting to log in...</span></p>
+            <p id="currentJwt" class="text-sm break-all mt-2"></p>
+        </div>
+
+        <!-- Client Warehouse Form -->
+        <form id="clientWarehouseForm" class="hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">Create New Warehouse</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="registered_name">Registered Name</label>
+                    <input type="text" id="registered_name" value="TEST_REG_NAME" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="pin">PIN Code</label>
+                    <input type="text" id="pin" name="pin" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <input type="text" id="country" name="country" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="return_address">Return Address</label>
+                    <input type="text" id="return_address" name="return_address" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="return_pin">Return PIN</label>
+                    <input type="text" id="return_pin" name="return_pin" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="return_city">Return City</label>
+                    <input type="text" id="return_city" name="return_city" required class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="return_state">Return State (Optional)</label>
+                    <input type="text" id="return_state" name="return_state" class="w-full">
+                </div>
+                <div class="form-group">
+                    <label for="return_country">Return Country</label>
+                    <input type="text" id="return_country" name="return_country" required class="w-full">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary w-full mt-8">Create Warehouse</button>
+        </form>
+
+        <!-- Response Message Area -->
+        <div id="responseMessage" class="message-box hidden"></div>
+    </div>
+
+    <script>
+        // Global variable to store the JWT token
+        let jwtToken = '';
+
+        // DOM elements
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const jwtStatus = document.getElementById('jwtStatus');
+        const jwtMessage = document.getElementById('jwtMessage');
+        const currentJwt = document.getElementById('currentJwt');
+        const clientWarehouseForm = document.getElementById('clientWarehouseForm');
+        const responseMessageDiv = document.getElementById('responseMessage');
+
+        /**
+         * Displays a message in the designated message area.
+         * @param {string} message - The message to display.
+         * @param {'success'|'error'|'info'} type - The type of message (influences styling).
+         */
+        function showMessage(message, type) {
+            responseMessageDiv.classList.remove('hidden', 'success', 'error', 'info');
+            responseMessageDiv.classList.add(type);
+            responseMessageDiv.innerHTML = message;
+        }
+
+        /**
+         * Clears the message from the designated message area.
+         */
+        function clearMessage() {
+            responseMessageDiv.classList.add('hidden');
+            responseMessageDiv.innerHTML = '';
+        }
+
+        /**
+         * Shows the loading spinner.
+         */
+        function showLoading() {
+            loadingSpinner.style.display = 'block';
+            clearMessage();
+        }
+
+        /**
+         * Hides the loading spinner.
+         */
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+        }
+
+        /**
+         * Handles the login process to obtain the JWT token.
+         */
+        async function performLogin() {
+            showLoading();
+            jwtStatus.classList.remove('hidden', 'success', 'error');
+            jwtStatus.classList.add('info');
+            jwtMessage.textContent = 'Attempting to log in...';
+            currentJwt.textContent = '';
+            clientWarehouseForm.classList.add('hidden'); // Hide form until login
+
+            try {
+                const response = await fetch('https://ltl-clients-api.delhivery.com/ums/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'Application/json' // Note: 'Application/json' as per curl example
+                    },
+                    body: JSON.stringify({
+                        username: 'CAMPUSEXXPRESB2BC',
+                        password: 'Shipon@12345'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    jwtToken = data.data.jwt;
+                    jwtStatus.classList.remove('info', 'error');
+                    jwtStatus.classList.add('success');
+                    jwtMessage.textContent = 'Login successful! JWT token obtained.';
+                    currentJwt.textContent = `JWT: ${jwtToken.substring(0, 50)}...`; // Show truncated JWT
+                    clientWarehouseForm.classList.remove('hidden'); // Show form after successful login
+                    console.log('JWT Token:', jwtToken);
+                } else {
+                    jwtStatus.classList.remove('info', 'success');
+                    jwtStatus.classList.add('error');
+                    jwtMessage.textContent = `Login failed: ${data.message || 'Unknown error'}`;
+                    currentJwt.textContent = '';
+                    console.error('Login failed:', data);
+                }
+            } catch (error) {
+                jwtStatus.classList.remove('info', 'success');
+                jwtStatus.classList.add('error');
+                jwtMessage.textContent = 'Network error during login. Please check console.';
+                currentJwt.textContent = '';
+                console.error('Login Fetch Error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        /**
+         * Handles the creation of a client warehouse.
+         * @param {Event} event - The form submission event.
+         */
+        async function createClientWarehouse(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            if (!jwtToken) {
+                showMessage('Error: JWT token not available. Please log in again.', 'error');
+                return;
+            }
+
+            showLoading();
+
+            const formData = new FormData(event.target);
+            const payload = {};
+            for (const [key, value] of formData.entries()) {
+                payload[key] = value;
+            }
+
+            // Ensure return_state is explicitly an empty string if not provided
+            if (!payload.return_state) {
+                payload.return_state = "";
+            }
+
+            try {
+                const response = await fetch('https://cors-anywhere.herokuapp.com/https://track.delhivery.com/api/backend/clientwarehouse/create/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) { // Delhivery API often returns 200 even for logical errors, check data.success
+                    if (data.success) {
+                        showMessage('Warehouse created successfully! Response: ' + JSON.stringify(data), 'success');
+                        console.log('Warehouse creation success:', data);
+                        // Optionally clear form or reset state here
+                    } else {
+                        showMessage('Warehouse creation failed: ' + (data.message || JSON.stringify(data)), 'error');
+                        console.error('Warehouse creation failed:', data);
+                    }
+                } else {
+                    // Handle non-200 HTTP responses
+                    showMessage(`API Error (${response.status}): ${data.message || JSON.stringify(data)}`, 'error');
+                    console.error('Warehouse API error:', response.status, data);
+                }
+            } catch (error) {
+                showMessage('Network error during warehouse creation. Please check console.', 'error');
+                console.error('Warehouse Fetch Error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', performLogin); // Perform login on page load
+        clientWarehouseForm.addEventListener('submit', createClientWarehouse); // Handle form submission
+    </script>
+</body>
+</html>
